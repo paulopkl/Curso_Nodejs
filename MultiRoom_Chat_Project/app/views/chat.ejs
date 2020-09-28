@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+		<title>Multiroom Chat</title>
+		<!-- JQUERY -->
+		<script src="js/jquery-2.2.1.js"></script>
+		<!-- bootstrap - link cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+			integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" 
+			crossorigin="anonymous">
+		<link href="css/style.css" rel="stylesheet">
+		<script type="text/javascript">
+		
+			$(document).ready(() => {
+				$("#exibe_chat").click(() => {
+					$("#conversa").show();
+					$("#peoples").hide();
+					ocultaNavbar();
+				});
+				
+				$("#exibe_participantes").click(() => {
+					$("#peoples").show();
+					$("#conversa").hide();
+					ocultaNavbar();
+				});
+			});
+			
+			ocultaNavbar = () => {
+				$("#btn_navbar_toggle").attr("class","navbar-toggle collapsed");
+				$("#navbar-collapse-1").attr("class","navbar-collapse collapse");
+				$("#btn_navbar_toggle").attr("aria-expanded","false");
+				$("#navbar-collapse-1").attr("aria-expanded","false");
+			}
+		</script>
+	</head>
+
+	<body>
+	
+	
+		<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" 
+						data-target="#navbar-collapse-1" id="btn_navbar_toggle">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">Multiroom Chat</a>
+				</div>
+				
+				
+				<div class="collapse navbar-collapse" id="navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a href="#" id="exibe_chat">Chat</a>
+						</li>
+						<li>
+							<a href="#" id="exibe_participantes">Participantes</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<div class="container">
+            <div class="row conversa" id="conversa">
+				<div class="col-md-1"></div>
+				<div class="col-md-10" id="dialogs">
+					<div class="dialogs">
+						<h4>Jorge</h4>
+						<p>Fala José, blz cara?</p>
+					</div>
+				</div>
+				<div class="col-md-1"></div>
+                
+            </div>
+			
+			<div class="row peoples" style="display:none" id="peoples">
+				<div class="col-md-1"></div>
+				<div class="col-md-10" id="people">
+					
+				</div>
+				<div class="col-md-1"></div>
+            </div>
+        </div>
+		
+		<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+			<div class="container">
+				<div class="panel-body campo-mensagem">
+					<div class="col-md-12">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Message"
+								id="message">
+							<input type="hidden" value="<%= dataForm.nickname %>" id="nickname">
+							<input type="hidden" value="0" id="nickname_updated_clients">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button" id="send_message">
+									>
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>		
+		
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" 
+			integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" 
+			crossorigin="anonymous"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+
+			const socket = io('http://localhost:3000');
+
+			// When clicked, execute a function called 'msgToServer' on the server
+			$("#send_message").click(() => {
+				socket.emit('msgToServer', { 
+					nickname: $('#nickname').val(),
+					message: $('#message').val(),
+					nickname_updated_clients: $('#nickname_updated_clients').val()
+				});
+
+				$('#message').val("");
+				$('#nickname_updated_clients').val(1);
+			});
+
+			socket.on("msgToClient", data => {
+
+				let html = '';
+
+				html += '<div class="dialogs">';
+					html += '<h4>' + data.nickname + '</h4>'; 
+					html += '<p>' + data.message + '</p>';
+				html += '</div>';
+
+				$('#dialogs').append(html);
+
+				window.scrollTo(0, document.body.scrollHeight);
+			});
+			
+			socket.on("peopleToClient", data => {
+
+				let html = '';
+
+				html += '<span class="people">';
+					html += '<img src="images/ico_usuario.png" />';
+					html += data.nickname;
+				html += '</span>';
+
+				$('#people').append(html);
+			});
+		</script>
+	</body>
+</html>

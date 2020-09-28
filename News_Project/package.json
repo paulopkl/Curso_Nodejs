@@ -1,0 +1,23 @@
+{
+  "name": "curso_nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "consign": "^0.1.6",
+    "ejs": "^2.5.6",
+    "express": "^4.17.1",
+    "express-validator": "^2.20.8",
+    "mysql": "^2.11.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "start": "nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
