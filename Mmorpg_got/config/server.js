@@ -20,6 +20,7 @@ app.use(expressValidator());
 consign()
     // Includes everything inside the folder 'routes'
     .include('app/routes')
+    .then('config/dbConnection.js')
     .then('app/models')
     .then('app/controllers')
     //  All modules will be inserted in the object 'app'
