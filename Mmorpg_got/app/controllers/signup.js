@@ -17,6 +17,11 @@ module.exports.register = (app, req, res) => {
         res.render("signup", { errors, data: dataForm });
         return;
     }
-    
+
+    const connection = app.config.dbConnection;
+    const UsersDAO = new app.app.models.usersDAO(connection);
+
+    UsersDAO.insertUser(dataForm);
+
     res.send('We can register!!');
 };
