@@ -19,9 +19,13 @@ module.exports.register = (app, req, res) => {
     }
 
     const connection = app.config.dbConnection;
+    
     const UsersDAO = new app.app.models.usersDAO(connection);
+    const GameDAO = new app.app.models.gameDAO(connection);
 
     UsersDAO.insertUser(dataForm);
+    GameDAO.generateParam(dataForm.user);
+    // Generate params
 
     res.send('We can register!!');
 };

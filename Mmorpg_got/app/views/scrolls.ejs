@@ -1,0 +1,39 @@
+<div id="pergaminhos">					
+	<h3>Scrolls</h3>
+	<ul>
+		<% for (let i = 0; i < data.length; i++) { %>
+			<%
+				let txt_action = '';
+
+				switch (+data[i].action) {
+					case 1: {
+						txt_action = '1 enforcamento(s) programado';
+						break;
+					}
+					case 2: {
+						txt_action = '2 aldeão(ões) em treinamento de magia';
+						break;
+					}
+					case 3: {
+						txt_action = '1 aldeão(ões) em treinamento de história';
+						break;
+					}
+					case 4: {
+						txt_action = '5 aldeão(ões) coletando recursos';
+						break;
+					}
+					default: {}
+				}
+				
+				let date = new Date();
+				let dateNow = date.getTime();
+				let secondsLeft = Math.round((data[i].action_finish_in - dateNow) / 1000);
+			%>
+			<li>
+				<%= data[i].quantity %> <%= txt_action %> 
+				- <small>Restam <span class="timeLeft"><%= secondsLeft %></span> segundos</small>
+				- <a href="/revogue_action?id_action=<%= data[i]._id %>">Revogue order</a>
+			</li>
+		<% } %>
+	</ul>
+</div>

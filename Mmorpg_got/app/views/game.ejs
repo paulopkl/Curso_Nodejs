@@ -2,20 +2,16 @@
 <html lang="pt-br">
 	<head>
 		<meta charset="UTF-8">
-
 		<title>MMORPG - Game of Thrones</title>
-		
 		<!-- JQuery -->
 		<script src="js/jquery-2.2.1.js"></script>
-
 		<!-- bootstrap - link cdn -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-	
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+			integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" 
+			crossorigin="anonymous">
 		<!-- incluindo css -->
 		<link href="css/style.css" rel="stylesheet">
-
 	</head>
-
 	<body class="body-jogo">
 
 		<nav class="navbar navbar-default navbar-static-top">
@@ -27,41 +23,66 @@
 		</nav>
 
 	    <div class="container">
-	    	
+			
+			<% if (msg === 'A') { %>
+				<div class="alert alert-danger" id="msg">
+					<strong>Invalid Operation, check all fields!</strong>
+				</div>
+			<% } %>
+			
+			<% if (msg === 'B') { %>
+				<div class="alert alert-info" id="msg">
+					<strong>Action successfully perfomed!</strong>
+				</div>
+			<% } %>
+			
+			<% if (msg === 'C') { %>
+				<div class="alert alert-info" id="msg">
+					<strong>Mr, the ordered activity has finished!</strong>
+				</div>
+			<% } %>
+			
+			<% if (msg === 'D') { %>
+				<div class="alert alert-info" id="msg">
+					<strong>Mr, your order has been revoked!</strong>
+				</div>
+			<% } %>
+			
 			<div class="row">
 	    		<div class="col-sm-3 casa">
-					<img src="images/casa_martell.jpg" />
+					<img src="images/casa_<%= img_house %>.jpg" />
 				</div>
 
 	    		<div class="col-sm-9">
 					<div class="row barra-superior">
 						<div class="col-sm-2"> 
 							<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
-							<span>754</span>
+							<span><%= gameData.fear %></span>
 						</div>
 						
 						<div class="col-sm-2"> 
 							<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria"/>
-							<span>754</span>
+							<span><%= gameData.wisdom %></span>
 						</div>
 						
 						<div class="col-sm-2"> 
 							<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio"/>
-							<span>754</span>
+							<span><%= gameData.commerce %></span>
 						</div>
 						
 						<div class="col-sm-2"> 
 							<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia"/>
-							<span>754</span>
+							<span><%= gameData.magic %></span>
 						</div>
 					</div>
 				</div>
 	    	</div>
 			
 			<div class="row">
-				<div class="col-sm-3"></div>
-				<div class="col-sm-9">
-					<div class="acoes"></div>					
+				<div class="col-sm-offset-3 col-sm-9">
+					<div class="acoes" id="actions">
+						Mister, what do you want to do today?
+					</div>					
 				</div>
 			</div>
 			
@@ -72,18 +93,20 @@
 			
 				<div class="row">
 					<div class="col-sm-1">
-						<img src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões"/>
+						<img src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões" id="btnSubjects"/>
+						<span><%= gameData.subjects %></span>
 					</div>
 					
 					<div class="col-sm-1">
-						<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"/>
+						<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"
+							id="btnScrolls"/>
 					</div>
 					
 					<div class="col-sm-8"></div>
 					
 					<div class="col-sm-2">
 						<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda"/>
-						<span>25</span>
+						<span><%= gameData.coin %></span>
 					</div>
 					
 				</div>
@@ -91,10 +114,51 @@
 		</div>
 		<script>
 			$(document).ready(() => {
+				
 				$('#btnExit').click(() => {
 					window.location.href = '/exit';
 				});
+
+				$('#btnSubjects').click(() => {
+					$('#msg').hide();
+					$.ajax({
+						url: '/subjects',
+						method: 'GET',
+						success: data => { $('#actions').html(data); }
+					});
+				});
+				
+				$('#btnScrolls').click(() => {
+					$('#msg').hide();
+					$.ajax({
+						url: '/scrolls',
+						method: 'GET',
+						success: data => { 
+							$('#actions').html(data);
+							clearTimeout(timerId);
+							chronometer();
+						}
+					});
+				});
 			});
+
+			let timerId = null;
+
+			function chronometer() {
+				$('.timeLeft').each(function () {
+					let seconds = $(this).html();
+					let secondsNow = parseInt(seconds) - 1;
+					
+					if (secondsNow < 0) {
+						window.href('/game?msg=C');
+					} else {
+						$(this).html(secondsNow);
+					}
+				});
+
+				timerId = setTimeout('chronometer()', 1000);
+			}
+
 		</script>
 	</body>
 </html>
