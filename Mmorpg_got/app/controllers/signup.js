@@ -9,6 +9,7 @@ module.exports.register = (app, req, res) => {
     req.assert('name', 'The Name Cannot be empty!!').notEmpty();
     req.assert('user', 'The User Cannot be empty!!').notEmpty();
     req.assert('password', 'The Password Cannot be empty!!').notEmpty();
+    req.assert('password', 'Password must contain between 3 and 15 characters!').len(3, 15);
     req.assert('house', 'The House Cannot be empty!!').notEmpty();
 
     const errors = req.validationErrors();

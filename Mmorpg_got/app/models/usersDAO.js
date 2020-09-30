@@ -1,16 +1,21 @@
+const crypto = require('crypto');
+
 function UsersDAO(connection) {
     this._connection = connection();
 }
 
-UsersDAO.prototype.insertUser = function(user) {
+UsersDAO.prototype.insertUser = function(data) {
     // Db.open(callback(error, client));
     this._connection.open((err, mongoclient) => {
         // handle documents within sections
 
+        // Generate HASH with crypto
+        const crypPassword = crypto.createHash('md5').update(data.password).digest('hex');
+        data.password = crypPassword;
+
         // mongoclient.collection('[database name]', callback(error, object));
         mongoclient.collection("users", (err, collection) => {
-            // console.log(user);
-            collection.insert(user);
+            collection.insert(data);
             // Close the connection
             mongoclient.close();
         });
@@ -20,6 +25,9 @@ UsersDAO.prototype.insertUser = function(user) {
 UsersDAO.prototype.Authenticate = function(data, req, res) {
     this._connection.open((err, mongoclient) => {
         mongoclient.collection("users", (err, collection) => {
+
+            data.password = crypto.createHash('md5').update(data.password).digest('hex');
+
             // collection.find({ user: { $eq: data.user }, password: { $eq: data.password } });
             // collection.find({ user: data.user, password: data.password });
             collection.find(data).toArray((err, result) => {
